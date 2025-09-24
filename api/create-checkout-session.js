@@ -3,21 +3,20 @@ import Stripe from 'stripe';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end('Method Not Allowed');
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
 
-  let email = '';
+  // Parsear body manualmente
+  let body;
   try {
-    const body = await new Promise((resolve, reject) => {
-      let data = '';
-      req.on('data', chunk => (data += chunk));
-      req.on('end', () => resolve(JSON.parse(data)));
-      req.on('error', err => reject(err));
-    });
-    email = body.email;
+    body = JSON.parse(req.body);
   } catch (err) {
-    console.error('Error parseando el body:', err);
+    console.error('Error parseando body:', err);
     return res.status(400).json({ error: 'Body inválido' });
   }
+
+  const email = body.email || undefined;
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -25,7 +24,7 @@ export default async function handler(req, res) {
       mode: 'subscription',
       line_items: [
         {
-          price: 'price_1SAj6fEM9QxNWEANj30BIW3k', // Price ID correcto
+          price: 'price_1SAj6fEM9QxNWEANj30BIW3k', // tu Price ID de Stripe
           quantity: 1,
         },
       ],
