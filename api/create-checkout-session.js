@@ -1,16 +1,20 @@
-import Stripe from 'stripe';
+// Usamos CommonJS para evitar problemas de import
+const Stripe = require('stripe');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  // Parsear body manualmente
+  // Parsear el body seguro
   let body;
   try {
-    body = JSON.parse(req.body);
+    body = req.body;
+    if (typeof body === 'string') {
+      body = JSON.parse(body);
+    }
   } catch (err) {
     console.error('Error parseando body:', err);
     return res.status(400).json({ error: 'Body inválido' });
@@ -38,4 +42,4 @@ export default async function handler(req, res) {
     console.error('Error creando sesión de Stripe:', err);
     res.status(500).json({ error: 'Algo salió mal con Stripe' });
   }
-}
+};
