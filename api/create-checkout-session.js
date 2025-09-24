@@ -13,7 +13,7 @@ export default async function handler(req, res) {
       mode: 'subscription',
       line_items: [
         {
-          price: 'price_1SAixxAEM9QxNWEAxxx', // <--- aquí va el ID de tu plan de Stripe
+          price: 'price_1SAj6fEM9QxNWEANj30BIW3k', // <--- aquí va el ID de tu plan de Stripe
           quantity: 1,
         },
       ],
